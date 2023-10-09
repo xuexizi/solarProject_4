@@ -8,8 +8,9 @@ import multiprocessing
 import time
 import queue
 
-solve_index = 6  # 执行次数，保存结果文件序列
+solve_index = 1  # 执行次数，保存结果文件序列
 simu_filename = 'simu_data/simu_' + str(solve_index) + '.txt'
+
 PHOTO_RANGE = (50, 110)  # 每个时间片中照片个数范围，三个等级的均值：50/80/110 ————（30-70）（50-110）（80-140）
 FACE_RANGE = (3, 7)  # 每张照片人脸个数范围，三个等级的均值：3/5/7 ————（1-5）（3-7）（5-9）
 
@@ -63,34 +64,14 @@ def read_photo_file(filename):
     return photo_info
 
 
-# 读取solar数据，读取后需要除以60，原因是本来的solar指的是watt/m^2。但是 1、我们的太阳能板没有那么大 2、因为太阳直射角不同，所以有损耗
-def read_charge_file(file_dir):
-    # file_dir = "simu_data/mon_1"  # file directory
-    all_csv_list = os.listdir(file_dir)  # get csv list
-    all_data_frame = []
-    for single_csv in all_csv_list:
-        single_data_frame = pd.read_csv(os.path.join(file_dir, single_csv),
-                                        sep='\t',
-                                        header=0,
-                                        usecols=["--Timestamp---", "Solar"],
-                                        converters={"Solar": lambda x: round(int(x) / 60, 2)},
-                                        skiprows=lambda x: x > 0 and x % 2 == 0
-                                        )
-        if single_csv == all_csv_list[0]:
-            all_data_frame = single_data_frame
-        else:
-            all_data_frame = pd.concat([all_data_frame, single_data_frame], ignore_index=True)
-    return all_data_frame["Solar"].values
-
-
 # 需要考虑的输入变量
 # Y[t]= max(Y[t-1] + L[t] - L_opt, 0)  与队列长度有关
 # L[t] = min(L[t-1] + C_t, L_max)  队列长度
 # C_t  t时刻到达的照片数目
 # L_t_queue  照片队列
-# E_c_t  当前时段（太阳能）充了多少电
-# B_t  电池剩余量
-def manual_solve(Alg_index, m_min, Y_t, Q_t, L_t, C_t, L_t_queue, E_c_t, B_t, isPrint=False):
+# E_c_t  根据当前电压和电流，预测出该时间片将会充入多少电
+# B_t  当前时间片开始时的 电量
+def manual_solve(Alg_index, m_min, Y_t, L_t, C_t, L_t_queue, E_c_t, B_t, isPrint=False):
     pm_list, mu_list, res_list, E_u_t_list = [], [], [], []
 
     # 由于 p=m，所以当 m 用枚举确定下来，就只剩下一个变量 mu_t，此时只需要根据所有约束找到 mu_t 的最小值即可
