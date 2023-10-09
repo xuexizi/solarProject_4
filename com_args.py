@@ -33,9 +33,9 @@ Mu_max = 2  # 最大处理能力（影响求解是否成功）：1.8GHz。
 Mu_min = 0.5 * Mu_max  # 最低处理能力（影响求解是否成功）：启动程序的最低要求
 E_u_idle_t = P_idle * delta
 
-T_s = 0.005  # 每张图片利用全部设备处理能力 Mu_max 来清点人脸数所需要的时长（3秒）
-T_r = 0.003  # 每个人脸在利用全部资源 Mu_max 来识别的时间（1.8秒）
-T_p = 0.015  # 最快启动程序所需时间（9秒钟）
+T_s = 0.005  # 每张图片利用全部设备处理能力 Mu_max 来清点人脸数所需要的时长（0.3秒）
+T_r = 0.003  # 每个人脸在利用全部资源 Mu_max 来识别的时间（0.18秒）
+T_p = 0.015  # 最快启动程序所需时间（0.9秒钟）
 
 
 # 生成模拟数据：每时刻照片信息
@@ -102,7 +102,6 @@ def manual_solve(Alg_index, m_min, Y_t, Q_t, L_t, C_t, L_t_queue, E_c_t, B_t, is
         T_sum = T_s * m + T_r * N_sum + T_p
         if Alg_index == 3:  # 照片来了就处理意味着，有几张照片就要启动几次
             T_sum = T_s * m + T_r * N_sum + T_p * m
-
         if T_sum > delta:
             continue
 

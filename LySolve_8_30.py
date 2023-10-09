@@ -264,7 +264,7 @@ def Ours(index):
     P_M = np.zeros(T + 1, dtype=int)  # 记录每个时刻的 p_t 和 m_t
     charge_flag = np.zeros(T + 1, dtype=int)   # 记录每个时刻是否在休眠充电
     lose_photo = np.zeros(T + 1, dtype=int)  # 丢失照片数目
-    C = np.zeros(T + 1, dtype=int)  # 存储C_t
+    C = np.zeros(T + 1, dtype=int)  # 存储t时刻到达的照片数
 
     for t in range(T):
         print("t = ", t)
